@@ -1,19 +1,112 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import MedicationList from '../components/MedicationList';
 import CalendarComponent from '../components/CalendarComponent';
 
 const HomeScreen = () => {
   const [medications, setMedications] = useState([]);
+  const [filteredMedications, setFilteredMedications] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  useEffect(() => {
+    fetch('https://medicare-api-khaki.vercel.app/api/medicamentos')
+      .then(response => response.json())
+      .then(data => {
+        setMedications(data);
+        filterMedications(data, selectedDate);
+      })
+      .catch(error => {
+        console.error('Error fetching medications:', error);
+      });
+  }, [selectedDate]);
+
+  const filterMedications = (medicationsList, date) => {
+    const filtered = medicationsList.filter(medication => {
+      if (medication.proxima_toma && medication.proxima_toma.fecha) {
+        const nextDoseDate = new Date(medication.proxima_toma.fecha).toISOString().split('T')[0];
+        return nextDoseDate === date;
+      }
+      return false;
+    });
+    setFilteredMedications(filtered);
+  };
 
   const handleDayPress = (day) => {
-    // Aquí puedes obtener los medicamentos del día seleccionado
-    // Por ahora, usaremos datos de ejemplo
-    const exampleMedications = [
-      { id: 1, name: 'Paracetamol', nextDose: '08:00 AM', image: 'https://example.com/paracetamol.png' },
-      { id: 2, name: 'Ibuprofeno', nextDose: '12:00 PM', image: 'https://example.com/ibuprofeno.png' },
-    ];
-    setMedications(exampleMedications);
+    const selectedDate = day.dateString;
+    setSelectedDate(selectedDate);
+    filterMedications(medications, selectedDate);
+  };
+
+  const calculateNextDose = (proximaToma, frecuencia) => {
+    const { fecha, hora, minuto } = proximaToma;
+    const { horas, minutos } = frecuencia;
+
+    // Crear un objeto Date con la fecha y hora actuales de la próxima toma
+    let nextDoseDate = new Date(fecha);
+    nextDoseDate.setUTCHours(hora, minuto, 0, 0);
+
+    // Sumar la frecuencia a la próxima toma
+    nextDoseDate.setUTCHours(nextDoseDate.getUTCHours() + horas[0]);
+    nextDoseDate.setUTCMinutes(nextDoseDate.getUTCMinutes() + minutos[0]);
+
+    // Obtener los nuevos valores de fecha, hora y minuto
+    const newDate = nextDoseDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    const newHour = nextDoseDate.getUTCHours();
+    const newMinute = nextDoseDate.getUTCMinutes();
+
+    return {
+        fecha: newDate,
+        hora: newHour,
+        minuto: newMinute
+    };
+  };
+
+  const handleMarkAsTaken = (id, medication) => {
+    const currentDoseDate = new Date(medication.proxima_toma.fecha);
+    currentDoseDate.setUTCHours(medication.proxima_toma.hora);
+    currentDoseDate.setUTCMinutes(medication.proxima_toma.minuto);
+
+    const nextDose = calculateNextDose({
+      fecha: currentDoseDate.toISOString().split('T')[0],
+      hora: currentDoseDate.getUTCHours(),
+      minuto: currentDoseDate.getUTCMinutes(),
+    }, medication.frecuencia);
+
+    // Update the medication's next dose while preserving frequency
+    const updatedMedication = {
+      ...medication,
+      proxima_toma: {
+        fecha: nextDose.fecha,
+        hora: nextDose.hora,
+        minuto: nextDose.minuto,
+      }
+    };
+
+    // Update medication on the server
+    fetch(`https://medicare-api-khaki.vercel.app/api/medicamentos/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedMedication),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Medication updated:', data);
+      // Refresh medications list
+      fetch('https://medicare-api-khaki.vercel.app/api/medicamentos')
+        .then(response => response.json())
+        .then(data => {
+          setMedications(data);
+          filterMedications(data, selectedDate);
+        })
+        .catch(error => {
+          console.error('Error refreshing medications:', error);
+        });
+    })
+    .catch(error => {
+      console.error('Error updating medication:', error);
+    });
   };
 
   return (
@@ -26,7 +119,7 @@ const HomeScreen = () => {
           <CalendarComponent onDayPress={handleDayPress} />
         </View>
         <View style={styles.listContainer}>
-          <MedicationList medications={medications} />
+          <MedicationList medications={filteredMedications} onMarkAsTaken={handleMarkAsTaken} />
         </View>
       </View>
     </View>
@@ -55,7 +148,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   calendarContainer: {
-    //flex: 1, 
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
