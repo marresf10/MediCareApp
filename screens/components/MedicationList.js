@@ -25,7 +25,7 @@ const MedicationList = ({ medications, onMarkAsTaken }) => {
         ...prevState,
         [id]: false,
       }));
-    }, 4000);
+    }, 1000);
   };
 
   const formatTime = (hour, minute) => {
@@ -41,7 +41,7 @@ const MedicationList = ({ medications, onMarkAsTaken }) => {
         <Image source={{ uri: item.image }} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.medicationName}>{item.nombre}</Text>
-          <Text style={styles.medicationTime}>Dosis: {item.proxima_toma ? `${new Date(item.proxima_toma.fecha).toLocaleDateString()} ${formatTime(item.proxima_toma.hora, item.proxima_toma.minuto)}` : 'N/A'}</Text>
+          <Text style={styles.medicationTime}>Tomar: {item.proxima_toma ? `${new Date(item.proxima_toma.fecha).toLocaleDateString()} - ${formatTime(item.proxima_toma.hora, item.proxima_toma.minuto)}`+"hrs" : 'N/A'}</Text>
         </View>
         <TouchableOpacity
           style={[styles.checkButton, isTaken && styles.checkButtonTaken]}

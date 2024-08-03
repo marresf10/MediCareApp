@@ -49,7 +49,7 @@ const HomeScreen = () => {
     nextDoseDate.setUTCHours(nextDoseDate.getUTCHours() + horas[0]);
     nextDoseDate.setUTCMinutes(nextDoseDate.getUTCMinutes() + minutos[0]);
 
-    // Obtener los nuevos valores de fecha, hora y minuto
+    // Obtener los valores nuevos de fecha, hora y minuto
     const newDate = nextDoseDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
     const newHour = nextDoseDate.getUTCHours();
     const newMinute = nextDoseDate.getUTCMinutes();
@@ -82,7 +82,7 @@ const HomeScreen = () => {
       }
     };
 
-    // Update medication on the server
+    // Actualizar en el server
     fetch(`https://medicare-api-khaki.vercel.app/api/medicamentos/${id}`, {
       method: 'PUT',
       headers: {
