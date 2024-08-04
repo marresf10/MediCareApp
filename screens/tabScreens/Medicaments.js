@@ -21,7 +21,7 @@ export default function Medicaments({ navigation }) {
                     console.log('Navigating to AddMedicament');
                     navigation.navigate('AddMedicament');
                 }}>
-                    <Text style={styles.buttonText}>Agregar</Text>
+                    <Text style={styles.buttonText}>    Agregar    </Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

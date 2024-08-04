@@ -11,12 +11,6 @@ export default function AddMedicament({ navigation }) {
     const [dosis, setDosis] = useState('');
     const [cantidadDosis, setCantidadDosis] = useState('');
 
-    Toast.show({
-        type: 'success',
-        text1: 'Medicamento agregado',
-        position: 'bottom',
-      });
-
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: 'Agregar Medicamento',
@@ -78,6 +72,12 @@ export default function AddMedicament({ navigation }) {
         })
         .then(data => {
             console.log('Medicamento agregado:', data);
+            Toast.show({
+                type: 'success',
+                position: 'bottom',
+                text1: 'Medicamento Agregado',
+                text2: 'El medicamento se ha guardado exitosamente.',
+            });
             navigation.goBack();
         })
         .catch(error => {
