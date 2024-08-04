@@ -1,21 +1,93 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import Toast from 'react-native-toast-message';
 
 export default function AddMedicament({ navigation }) {
     const [nombre, setNombre] = useState('');
     const [tipo, setTipo] = useState('pastilla');
     const [frecuenciaHoras, setFrecuenciaHoras] = useState(0);
     const [frecuenciaMinutos, setFrecuenciaMinutos] = useState(0);
+    const [dosis, setDosis] = useState('');
+    const [cantidadDosis, setCantidadDosis] = useState('');
+
+    Toast.show({
+        type: 'success',
+        text1: 'Medicamento agregado',
+        position: 'bottom',
+      });
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: 'Agregar Medicamento',
+            headerTitleAlign: 'center',
+            headerStyle: {
+                backgroundColor: '#A8DADC',
+            },
+            headerTitleStyle: {
+                fontWeight: 'bold',
+            },
+        });
+    }, [navigation]);
 
     const handleSave = () => {
-        console.log(`Nombre: ${nombre}, Tipo: ${tipo}, Frecuencia: ${frecuenciaHoras} horas y ${frecuenciaMinutos} minutos`);
-        navigation.goBack();
+        const now = new Date();
+        const fechaActual = now.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        const horaActual = now.getHours(); // Hora local
+        const minutoActual = now.getMinutes(); // Minuto local
+
+        // Calcular la próxima toma basada en la frecuencia
+        const proximaToma = new Date(now);
+        proximaToma.setHours(proximaToma.getHours() + frecuenciaHoras);
+        proximaToma.setMinutes(proximaToma.getMinutes() + frecuenciaMinutos);
+
+        // Ajustar la fecha si la hora o minuto exceden los límites
+        const fechaProximaToma = proximaToma.toISOString().split('T')[0];
+        const horaProximaToma = proximaToma.getHours();
+        const minutoProximaToma = proximaToma.getMinutes();
+
+        // Crear el objeto medicamento
+        const newMedicament = {
+            nombre,
+            dosis,
+            presentación: tipo,
+            frecuencia: {
+                horas: [frecuenciaHoras],
+                minutos: [frecuenciaMinutos]
+            },
+            proxima_toma: {
+                fecha: fechaProximaToma,
+                hora: horaProximaToma,
+                minuto: minutoProximaToma
+            },
+            cantidad_dosis_disponibles: parseInt(cantidadDosis, 10)
+        };
+
+        fetch('https://medicare-api-khaki.vercel.app/api/medicamentos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newMedicament),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Medicamento agregado:', data);
+            navigation.goBack();
+        })
+        .catch(error => {
+            console.error('Error al agregar medicamento:', error);
+        });
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Nombre del Medicamento:</Text>
+            <Text style={styles.label}>Medicamento:</Text>
             <TextInput style={styles.input} value={nombre} onChangeText={setNombre} />
 
             <Text style={styles.label}>Tipo de Medicamento:</Text>
@@ -39,7 +111,15 @@ export default function AddMedicament({ navigation }) {
                 </Picker>
             </View>
 
-            <Button title="Guardar" onPress={handleSave} />
+            <Text style={styles.label}>Dosis (ej: 500gr):</Text>
+            <TextInput style={styles.input} value={dosis} onChangeText={setDosis} />
+
+            <Text style={styles.label}>Cantidad de Dosis Disponibles:</Text>
+            <TextInput style={styles.input} value={cantidadDosis} onChangeText={setCantidadDosis} keyboardType="numeric" />
+
+            <TouchableOpacity style={styles.button} onPress={handleSave}>
+                <Text style={styles.buttonText}>Guardar</Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -57,17 +137,30 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 10,
-        marginBottom: 20,
-        borderRadius: 5,
+        padding: 15,
+        marginBottom: 25,
+        borderRadius: 10,
     },
     pickerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 25,
     },
     picker: {
         flex: 1,
         height: 50,
+    },
+    button: {
+        backgroundColor: '#457B9D',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        alignSelf: 'center',
+        width: '50%',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
