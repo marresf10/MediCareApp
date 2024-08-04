@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Dimensio
 
 const { width, height } = Dimensions.get('window');
 
-export default function Medicaments() {
+export default function Medicaments({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.topBar}>
@@ -11,15 +11,17 @@ export default function Medicaments() {
             </View>
             <View style={styles.content}>
                 <View style={styles.imageContainer}>
-                    {/* Puedes reemplazar el URI con la imagen deseada */}
                     <Image 
                         source={{ uri: 'https://th.bing.com/th/id/OIP._JtdHaQZAUe8roEHR3qXfwHaHa?rs=1&pid=ImgDetMain' }} 
                         style={styles.image}
                     />
                 </View>
-                <Text style={styles.title}>Añade tus medicamentos</Text>
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>   Agregar   </Text>
+                <Text style={styles.title}>Agrega tus medicamentos</Text>
+                <TouchableOpacity style={styles.button} onPress={() => {
+                    console.log('Navigating to AddMedicament');
+                    navigation.navigate('AddMedicament');
+                }}>
+                    <Text style={styles.buttonText}>Agregar</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -48,16 +50,16 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     imageContainer: {
-        width: width * 0.4, // 40% of screen width
-        height: width * 0.4, // Maintain aspect ratio
+        width: width * 0.4,
+        height: width * 0.4,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
     },
     image: {
-        width: '100%', // Take full width of the container
-        height: '100%', // Take full height of the container
-        borderRadius: (width * 0.4) / 2, // Circular image
+        width: '100%',
+        height: '100%',
+        borderRadius: (width * 0.4) / 2,
     },
     title: {
         fontSize: 18,
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#457B9D',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 25, // A larger borderRadius for more rounded corners
+        borderRadius: 25,
     },
     buttonText: {
         color: '#fff',

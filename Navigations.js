@@ -1,32 +1,50 @@
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
+
 import Feed from './screens/tabScreens/Feed';
 import Medicaments from './screens/tabScreens/Medicaments';
+import AddMedicament from './screens/homeStack/AddMedicament';
 import Settings from './screens/tabScreens/Settings';
 import Home from './screens/tabScreens/HomeScreen';
-import { Ionicons } from '@expo/vector-icons';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetailScreen from './screens/homeStack/DetailsScreen';
 
-// Configuración del Stack Navigator
-const Stack = createNativeStackNavigator();
+const FeedStack = createNativeStackNavigator();
 
-function StackGroup() {
+function FeedStackGroup() {
     return (
-        <Stack.Navigator>
-            <Stack.Screen 
+        <FeedStack.Navigator>
+            <FeedStack.Screen 
                 name="FeedMain"
                 component={Feed} 
                 options={{ headerShown: false }}
             />
-            <Stack.Screen
+            <FeedStack.Screen
                 name="Details"
                 component={DetailScreen}
-                options={({ route }) => ({
-                    // Opciones para DetailsScreen
-                })}
             />
-        </Stack.Navigator>
+        </FeedStack.Navigator>
+    );
+}
+
+const MedicamentsStack = createNativeStackNavigator();
+
+function MedicamentsStackGroup() {
+    return (
+        <MedicamentsStack.Navigator>
+            <MedicamentsStack.Screen 
+                name="MedicamentsMain"
+                component={Medicaments} 
+                options={{ headerShown: false }}
+            />
+            <MedicamentsStack.Screen 
+                name="AddMedicament"
+                component={AddMedicament}
+                options={{ title: 'Agregar Medicamento' }}
+            />
+        </MedicamentsStack.Navigator>
     );
 }
 
@@ -61,7 +79,7 @@ function TabGroup() {
             />
             <Tab.Screen 
                 name="Medicaments" 
-                component={Medicaments}
+                component={MedicamentsStackGroup}
                 options={{ tabBarLabel: "Medicaments" }}
             />
             <Tab.Screen 

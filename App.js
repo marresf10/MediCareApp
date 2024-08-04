@@ -1,10 +1,9 @@
 import "react-native-gesture-handler";
-import { StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native';
+import React from 'react';
 import Navigation from './Navigations';
 
 export default function App() {
-  return(
-    <Navigation></Navigation>
+  return (
+    <Navigation />
   );
-};
-
+}
