@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
+import { Calendar } from 'react-native-calendars';
 
 export default function EditMedicament({ route, navigation }) {
     // Verifica los datos en route.params
@@ -15,11 +16,11 @@ export default function EditMedicament({ route, navigation }) {
 
     const [nombre, setNombre] = useState(medication.nombre);
     const [tipo, setTipo] = useState(medication.presentación);
-    const [frecuenciaHoras, setFrecuenciaHoras] = useState(medication.frecuencia.hora);
-    const [frecuenciaMinutos, setFrecuenciaMinutos] = useState(medication.frecuencia.minuto);
+    const [frecuenciaHoras, setFrecuenciaHoras] = useState(medication.frecuencia.hora || 0); // Default to 0 if undefined
+    const [frecuenciaMinutos, setFrecuenciaMinutos] = useState(medication.frecuencia.minuto || 0); // Default to 0 if undefined
     const [dosis, setDosis] = useState(medication.dosis);
     const [cantidadDosis, setCantidadDosis] = useState(String(medication.cantidad_dosis_disponibles));
-    const [proximaTomaFecha, setProximaTomaFecha] = useState(new Date(medication.proxima_toma.fecha));
+    const [proximaTomaFecha, setProximaTomaFecha] = useState(new Date(medication.proxima_toma.fecha).toISOString().split('T')[0]);
     const [proximaTomaHora, setProximaTomaHora] = useState(medication.proxima_toma.hora);
     const [proximaTomaMinuto, setProximaTomaMinuto] = useState(medication.proxima_toma.minuto);
 
@@ -46,7 +47,7 @@ export default function EditMedicament({ route, navigation }) {
                 minuto: frecuenciaMinutos
             },
             proxima_toma: {
-                fecha: proximaTomaFecha.toISOString().split('T')[0], // Solo la fecha en formato YYYY-MM-DD
+                fecha: proximaTomaFecha, // Ya está en formato YYYY-MM-DD
                 hora: proximaTomaHora,
                 minuto: proximaTomaMinuto
             },
@@ -87,6 +88,10 @@ export default function EditMedicament({ route, navigation }) {
         });
     };
 
+    const handleDateChange = (day) => {
+        setProximaTomaFecha(day.dateString);
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Medicamento:</Text>
@@ -115,11 +120,10 @@ export default function EditMedicament({ route, navigation }) {
 
             <Text style={styles.label}>Próxima Toma:</Text>
             <Text style={styles.label}>Fecha:</Text>
-            <TextInput
-                style={styles.input}
-                value={proximaTomaFecha.toISOString().split('T')[0]}
-                onChangeText={text => setProximaTomaFecha(new Date(text))}
-                placeholder="YYYY-MM-DD"
+            <Calendar
+                current={proximaTomaFecha}
+                onDayPress={handleDateChange}
+                markedDates={{ [proximaTomaFecha]: { selected: true, marked: true } }}
             />
             
             <Text style={styles.label}>Hora:</Text>

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-
+import { Calendar } from 'react-native-calendars';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Medicaments({ navigation }) {
     const [medications, setMedications] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     const fetchMedications = () => {
         fetch('https://medicare-api-khaki.vercel.app/api/medicamentos')
@@ -37,6 +38,21 @@ export default function Medicaments({ navigation }) {
             default:
                 return '';
         }
+    };
+
+    const formatFrequency = (frecuencia) => {
+        const hours = (frecuencia.horas && frecuencia.horas.length > 0) ? frecuencia.horas[0] : 0;
+        const minutes = (frecuencia.minutos && frecuencia.minutos.length > 0) ? frecuencia.minutos[0] : 0;
+        return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+    };
+
+    const handleDateChange = (day) => {
+        setSelectedDate(day.dateString);
+    };
+
+    const handleSave = () => {
+        console.log('Fecha seleccionada:', selectedDate);
+        // Aquí deberías enviar la fecha seleccionada al backend o al estado correspondiente
     };
 
     return (
@@ -76,11 +92,14 @@ export default function Medicaments({ navigation }) {
                             style={styles.medicationContainer}
                             onPress={() => navigation.navigate('EditMedicament', { medication })}
                         >
-                            <Text style={styles.medicationName}>{medication.nombre}</Text>
                             <Image
                                 source={{ uri: getImageForType(medication.presentación) }}
                                 style={styles.medicationImage}
                             />
+                            <View style={styles.medicationInfo}>
+                                <Text style={styles.medicationName}>{medication.nombre}</Text>
+                                <Text style={styles.medicationFrequency}>Frecuencia: {formatFrequency(medication.frecuencia)}</Text>
+                            </View>
                         </TouchableOpacity>
                     ))
                 )}
@@ -142,17 +161,25 @@ const styles = StyleSheet.create({
     },
     medicationContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 15,
+        padding: 20, // Increased padding for a larger height
         borderBottomWidth: 1,
         borderColor: '#ccc',
     },
+    medicationInfo: {
+        marginLeft: 10,
+        flex: 1,
+    },
     medicationName: {
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    medicationFrequency: {
+        fontSize: 14,
+        color: '#666',
     },
     medicationImage: {
-        width: 40,
-        height: 40,
+        width: 50,
+        height: 50,
     },
 });
