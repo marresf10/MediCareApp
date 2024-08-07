@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Feed from './screens/tabScreens/Feed';
 import Medicaments from './screens/tabScreens/Medicaments';
 import AddMedicament from './screens/homeStack/AddMedicament';
+import EditMedicament from './screens/homeStack/EditMedicament';
 import Settings from './screens/tabScreens/Settings';
 import Home from './screens/tabScreens/HomeScreen';
 import DetailScreen from './screens/homeStack/DetailsScreen';
@@ -43,6 +44,11 @@ function MedicamentsStackGroup() {
                 name="AddMedicament"
                 component={AddMedicament}
                 options={{ title: 'Agregar Medicamento' }}
+            />
+            <MedicamentsStack.Screen 
+                name="EditMedicament"
+                component={EditMedicament}
+                options={{ title: 'Editar Medicamento' }}
             />
         </MedicamentsStack.Navigator>
     );

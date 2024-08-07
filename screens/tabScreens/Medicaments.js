@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import MedicationListAll from '../components/MedicationListAll';
+
 
 const { width, height } = Dimensions.get('window');
 
 export default function Medicaments({ navigation }) {
     const [medications, setMedications] = useState([]);
 
-    // Función para obtener medicamentos
     const fetchMedications = () => {
         fetch('https://medicare-api-khaki.vercel.app/api/medicamentos')
             .then(response => response.json())
@@ -18,16 +17,27 @@ export default function Medicaments({ navigation }) {
     };
 
     useEffect(() => {
-        // Cargar medicamentos al montar el componente
         fetchMedications();
     }, []);
 
     useFocusEffect(
         React.useCallback(() => {
-            // Actualizar la lista de medicamentos cuando la pantalla recibe el foco
             fetchMedications();
         }, [])
     );
+
+    const getImageForType = (type) => {
+        switch (type) {
+            case 'pastilla':
+                return 'https://th.bing.com/th/id/R.fd24f4923474d9f8a1535899e84a9bda?rik=IdyanhYKmGK2rA&pid=ImgRaw&r=0';
+            case 'gotas':
+                return 'https://cdn-icons-png.flaticon.com/512/4465/4465359.png';
+            case 'polvo':
+                return 'https://media.istockphoto.com/id/1270354543/es/vector/ilustraci%C3%B3n-de-la-apertura-del-medicamento-en-polvo-de-naranja.jpg?s=170667a&w=0&k=20&c=3GhgiV8k1kaGQgk3E19nvcXEhA1HWdjTTHHztEkCQeg=';
+            default:
+                return '';
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -60,7 +70,19 @@ export default function Medicaments({ navigation }) {
                         </TouchableOpacity>
                     </>
                 ) : (
-                    <MedicationListAll medications={medications} />
+                    medications.map((medication) => (
+                        <TouchableOpacity
+                            key={medication._id}
+                            style={styles.medicationContainer}
+                            onPress={() => navigation.navigate('EditMedicament', { medication })}
+                        >
+                            <Text style={styles.medicationName}>{medication.nombre}</Text>
+                            <Image
+                                source={{ uri: getImageForType(medication.presentación) }}
+                                style={styles.medicationImage}
+                            />
+                        </TouchableOpacity>
+                    ))
                 )}
             </View>
         </SafeAreaView>
@@ -88,8 +110,6 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         padding: 20,
     },
     imageContainer: {
@@ -119,5 +139,20 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 16,
+    },
+    medicationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+    },
+    medicationName: {
+        fontSize: 18,
+    },
+    medicationImage: {
+        width: 40,
+        height: 40,
     },
 });
