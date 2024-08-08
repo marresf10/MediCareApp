@@ -1,7 +1,6 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import Toast from 'react-native-toast-message';
 
 export default function AddMedicament({ navigation }) {
     const [nombre, setNombre] = useState('');
@@ -72,16 +71,19 @@ export default function AddMedicament({ navigation }) {
         })
         .then(data => {
             console.log('Medicamento agregado:', data);
-            Toast.show({
-                type: 'success',
-                position: 'bottom',
-                text1: 'Medicamento Agregado',
-                text2: 'El medicamento se ha guardado exitosamente.',
-            });
-            navigation.goBack();
+            Alert.alert(
+                'Medicamento Agregado',
+                'El medicamento se ha guardado exitosamente.',
+                [{ text: 'OK', onPress: () => navigation.goBack() }]
+            );
         })
         .catch(error => {
             console.error('Error al agregar medicamento:', error);
+            Alert.alert(
+                'Error',
+                'Hubo un problema al agregar el medicamento.',
+                [{ text: 'OK' }]
+            );
         });
     };
 
@@ -132,19 +134,23 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        marginVertical: 10,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#333',
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 15,
-        marginBottom: 25,
-        borderRadius: 10,
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 20,
+        fontSize: 16,
+        backgroundColor: '#f9f9f9',
     },
     pickerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 25,
+        marginBottom: 20,
     },
     picker: {
         flex: 1,
@@ -152,8 +158,8 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#457B9D',
-        padding: 15,
-        borderRadius: 30,
+        paddingVertical: 15,
+        borderRadius: 25,
         alignItems: 'center',
         alignSelf: 'center',
         width: '50%',

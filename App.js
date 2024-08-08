@@ -1,13 +1,15 @@
-import "react-native-gesture-handler";
+import 'react-native-gesture-handler';
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Navigation from './Navigations';
-import Toast from 'react-native-toast-message';
+import { ToastProvider } from './ToastContext';
 
 export default function App() {
   return (
-    <>
-      <Navigation />
-      <Toast ref={(ref) => Toast.setRef(ref)} />
-    </>
+    <ToastProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Navigation />
+      </GestureHandlerRootView>
+    </ToastProvider>
   );
 }

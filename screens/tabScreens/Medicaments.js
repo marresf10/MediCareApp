@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { Calendar } from 'react-native-calendars';
+import { Swipeable } from 'react-native-gesture-handler'; // Importa Swipeable para manejar gestos
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function Medicaments({ navigation }) {
     const [medications, setMedications] = useState([]);
@@ -50,10 +50,47 @@ export default function Medicaments({ navigation }) {
         setSelectedDate(day.dateString);
     };
 
-    const handleSave = () => {
-        console.log('Fecha seleccionada:', selectedDate);
-        // Aquí deberías enviar la fecha seleccionada al backend o al estado correspondiente
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Confirmar Eliminación",
+            "¿Estás seguro de que deseas eliminar este medicamento?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Eliminar",
+                    onPress: () => {
+                        fetch(`https://medicare-api-khaki.vercel.app/api/medicamentos/${id}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            fetchMedications(); // Recargar la lista después de eliminar
+                            //aqui quiero agregar mi alerta o mensaje
+                        })
+                        .catch(error => console.error('Error al eliminar medicamento:', error));
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
     };
+
+    const renderRightActions = (id) => (
+        <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDelete(id)}
+        >
+            <Text style={styles.deleteButtonText}>Eliminar</Text>
+        </TouchableOpacity>
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -87,20 +124,21 @@ export default function Medicaments({ navigation }) {
                     </>
                 ) : (
                     medications.map((medication) => (
-                        <TouchableOpacity
-                            key={medication._id}
-                            style={styles.medicationContainer}
-                            onPress={() => navigation.navigate('EditMedicament', { medication })}
-                        >
-                            <Image
-                                source={{ uri: getImageForType(medication.presentación) }}
-                                style={styles.medicationImage}
-                            />
-                            <View style={styles.medicationInfo}>
-                                <Text style={styles.medicationName}>{medication.nombre}</Text>
-                                <Text style={styles.medicationFrequency}>Frecuencia: {formatFrequency(medication.frecuencia)}</Text>
-                            </View>
-                        </TouchableOpacity>
+                        <Swipeable key={medication._id} renderRightActions={() => renderRightActions(medication._id)}>
+                            <TouchableOpacity
+                                style={styles.medicationContainer}
+                                onPress={() => navigation.navigate('EditMedicament', { medication })}
+                            >
+                                <Image
+                                    source={{ uri: getImageForType(medication.presentación) }}
+                                    style={styles.medicationImage}
+                                />
+                                <View style={styles.medicationInfo}>
+                                    <Text style={styles.medicationName}>{medication.nombre}</Text>
+                                    <Text style={styles.medicationFrequency}>Frecuencia: {formatFrequency(medication.frecuencia)}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </Swipeable>
                     ))
                 )}
             </View>
@@ -162,7 +200,7 @@ const styles = StyleSheet.create({
     medicationContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 20, // Increased padding for a larger height
+        padding: 20,
         borderBottomWidth: 1,
         borderColor: '#ccc',
     },
@@ -181,5 +219,19 @@ const styles = StyleSheet.create({
     medicationImage: {
         width: 50,
         height: 50,
+    },
+    deleteButton: {
+        backgroundColor: '#D9534F',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 140, 
+        height: '100%',
+        paddingHorizontal: 15,
+    },
+    deleteButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
