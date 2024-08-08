@@ -34,6 +34,12 @@ const MedicationList = ({ medications, onMarkAsTaken }) => {
     return `${formattedHour}:${formattedMinute}`;
   };
 
+  const addOneDay = (dateString) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString();
+  };
+
   const renderItem = ({ item }) => {
     const isTaken = takenMedications[item._id];
     return (
@@ -41,7 +47,9 @@ const MedicationList = ({ medications, onMarkAsTaken }) => {
         <Image source={{ uri: item.image }} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.medicationName}>{item.nombre}</Text>
-          <Text style={styles.medicationTime}>Tomar: {item.proxima_toma ? `${new Date(item.proxima_toma.fecha).toLocaleDateString()} - ${formatTime(item.proxima_toma.hora, item.proxima_toma.minuto)}`+"hrs" : 'N/A'}</Text>
+          <Text style={styles.medicationTime}>
+            Tomar: {item.proxima_toma ? `${addOneDay(item.proxima_toma.fecha)} - ${formatTime(item.proxima_toma.hora, item.proxima_toma.minuto)}hrs` : 'N/A'}
+          </Text>
         </View>
         <TouchableOpacity
           style={[styles.checkButton, isTaken && styles.checkButtonTaken]}

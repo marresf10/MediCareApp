@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { Swipeable } from 'react-native-gesture-handler'; // Importa Swipeable para manejar gestos
+import { Swipeable } from 'react-native-gesture-handler';
 
 const { width } = Dimensions.get('window');
 
@@ -72,8 +72,7 @@ export default function Medicaments({ navigation }) {
                             return response.json();
                         })
                         .then(data => {
-                            fetchMedications(); // Recargar la lista después de eliminar
-                            //aqui quiero agregar mi alerta o mensaje
+                            fetchMedications();
                         })
                         .catch(error => console.error('Error al eliminar medicamento:', error));
                     }
@@ -107,7 +106,7 @@ export default function Medicaments({ navigation }) {
             </View>
             <View style={styles.content}>
                 {medications.length === 0 ? (
-                    <>
+                    <View style={styles.emptyContainer}>
                         <View style={styles.imageContainer}>
                             <Image 
                                 source={{ uri: 'https://th.bing.com/th/id/OIP._JtdHaQZAUe8roEHR3qXfwHaHa?rs=1&pid=ImgDetMain' }} 
@@ -119,9 +118,9 @@ export default function Medicaments({ navigation }) {
                             style={styles.button} 
                             onPress={() => navigation.navigate('AddMedicament')}
                         >
-                            <Text style={styles.buttonText}>Agregar</Text>
+                            <Text style={styles.buttonText}>   Agregar   </Text>
                         </TouchableOpacity>
-                    </>
+                    </View>
                 ) : (
                     medications.map((medication) => (
                         <Swipeable key={medication._id} renderRightActions={() => renderRightActions(medication._id)}>
@@ -168,6 +167,11 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         padding: 20,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     imageContainer: {
         width: width * 0.4,
