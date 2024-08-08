@@ -31,7 +31,7 @@ const DetailScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#59788E', // Azul marino claro
+        backgroundColor: '#59788E',
     },
     productContainer: {
         flex: 1,

@@ -41,16 +41,13 @@ const HomeScreen = () => {
     const { fecha, hora, minuto } = proximaToma;
     const { horas, minutos } = frecuencia;
 
-    // Crear un objeto Date con la fecha y hora actuales de la próxima toma
     let nextDoseDate = new Date(fecha);
     nextDoseDate.setUTCHours(hora, minuto, 0, 0);
 
-    // Sumar la frecuencia a la próxima toma
     nextDoseDate.setUTCHours(nextDoseDate.getUTCHours() + horas[0]);
     nextDoseDate.setUTCMinutes(nextDoseDate.getUTCMinutes() + minutos[0]);
 
-    // Obtener los valores nuevos de fecha, hora y minuto
-    const newDate = nextDoseDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    const newDate = nextDoseDate.toISOString().split('T')[0];
     const newHour = nextDoseDate.getUTCHours();
     const newMinute = nextDoseDate.getUTCMinutes();
 
@@ -72,7 +69,6 @@ const HomeScreen = () => {
       minuto: currentDoseDate.getUTCMinutes(),
     }, medication.frecuencia);
 
-    // Update the medication's next dose while preserving frequency
     const updatedMedication = {
       ...medication,
       proxima_toma: {
@@ -82,7 +78,6 @@ const HomeScreen = () => {
       }
     };
 
-    // Actualizar en el server
     fetch(`https://medicare-api-khaki.vercel.app/api/medicamentos/${id}`, {
       method: 'PUT',
       headers: {
@@ -93,7 +88,6 @@ const HomeScreen = () => {
     .then(response => response.json())
     .then(data => {
       console.log('Medication updated:', data);
-      // Refresh medications list
       fetch('https://medicare-api-khaki.vercel.app/api/medicamentos')
         .then(response => response.json())
         .then(data => {

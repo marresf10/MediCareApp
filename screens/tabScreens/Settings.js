@@ -4,10 +4,10 @@ import { SafeAreaView, StyleSheet, Text, View, Switch, TouchableOpacity, Dimensi
 const { width } = Dimensions.get('window');
 
 export default function Settings() {
-    const [isDarkMode, setIsDarkMode] = useState(false); // Estado para manejar el tema
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleTheme = () => {
-        setIsDarkMode(!isDarkMode); // Alternar entre claro y oscuro
+        setIsDarkMode(!isDarkMode);
     };
 
     return (

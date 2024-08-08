@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         shadowOffset: { width: 0, height: 2 },
-        width: width - 40, // Ajusta el ancho del contenedor de acuerdo al ancho de la pantalla
+        width: width - 40,
     },
     textContainer: {
         flex: 1,
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         paddingHorizontal: 15,
         borderRadius: 30,
-        marginRight: 20, // Añadir margen a la derecha del botón
+        marginRight: 20,
     },
     buttonText: {
         color: '#fff',

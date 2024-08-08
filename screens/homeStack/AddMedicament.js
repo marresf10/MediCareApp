@@ -25,21 +25,18 @@ export default function AddMedicament({ navigation }) {
 
     const handleSave = () => {
         const now = new Date();
-        const fechaActual = now.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-        const horaActual = now.getHours(); // Hora local
-        const minutoActual = now.getMinutes(); // Minuto local
+        const fechaActual = now.toISOString().split('T')[0];
+        const horaActual = now.getHours();
+        const minutoActual = now.getMinutes();
 
-        // Calcular la próxima toma basada en la frecuencia
         const proximaToma = new Date(now);
         proximaToma.setHours(proximaToma.getHours() + frecuenciaHoras);
         proximaToma.setMinutes(proximaToma.getMinutes() + frecuenciaMinutos);
 
-        // Ajustar la fecha si la hora o minuto exceden los límites
         const fechaProximaToma = proximaToma.toISOString().split('T')[0];
         const horaProximaToma = proximaToma.getHours();
         const minutoProximaToma = proximaToma.getMinutes();
 
-        // Crear el objeto medicamento
         const newMedicament = {
             nombre,
             dosis,
